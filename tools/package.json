@@ -1,0 +1,14 @@
+{
+  "name": "octave-ui-tools",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Playwright render harness for octave-ui variant screenshots",
+  "scripts": {
+    "render": "node render-variant.mjs",
+    "install:browser": "npx playwright install chromium --with-deps"
+  },
+  "dependencies": {
+    "playwright": "^1.48.0"
+  }
+}

@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>octave-ui render harness</title>
+
+    <!-- Falcon font (CDN fallback to system sans). Don't block render. -->
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+      crossorigin="anonymous"
+    />
+    <style>
+      /* Falcon is a Mozart proprietary face. If it fails to load via the
+         embedded @font-face below, we silently fall back to system sans. */
+      @font-face {
+        font-family: "Falcon";
+        src: url("https://fonts.cdnfonts.com/s/14869/Falcon-Bold.woff")
+          format("woff");
+        font-display: swap;
+      }
+
+      /* Mozart design-system CSS variables (mirrors web/src/index.css subset).
+         Use these in HTML snippets via var(--mono-100) / var(--radius-md) etc. */
+      :root {
+        /* Monochrome scale -- primary design system */
+        --mono-0: #000000;
+        --mono-50: #040404;
+        --mono-75: #070707;
+        --mono-100: #0a0a0a;
+        --mono-200: #191919;
+        --mono-300: #252525;
+        --mono-400: #303030;
+        --mono-500: #474747;
+        --mono-600: #5e5e5e;
+        --mono-700: #787878;
+        --mono-800: #9c9c9c;
+        --mono-900: #bababa;
+        --mono-950: #d9d9d9;
+        --mono-1000: #ffffff;
+
+        /* Accents */
+        --tangerine: #ffb413;
+        --coral: #ff615e;
+        --salmon: #ff7c68;
+        --charcoal: #121212;
+
+        /* DAW interface */
+        --daw-bg-primary: #0a0a0a;
+        --daw-bg-secondary: #1a1a1a;
+        --daw-bg-tertiary: #2a2a2a;
+        --daw-accent-primary: #4ade80;
+        --daw-accent-secondary: #22c55e;
+
+        /* Audio metering */
+        --meter-safe: #22c55e;
+        --meter-moderate: #eab308;
+        --meter-hot: #f97316;
+        --meter-clip: #ef4444;
+
+        /* Radii */
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 8px;
+        --radius-xl: 12px;
+
+        /* Spacing scale (rem) */
+        --spacing-1: 0.25rem;
+        --spacing-2: 0.5rem;
+        --spacing-3: 0.75rem;
+        --spacing-4: 1rem;
+        --spacing-6: 1.5rem;
+        --spacing-8: 2rem;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family:
+          "Falcon",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          "Helvetica Neue",
+          Arial,
+          sans-serif;
+        font-feature-settings:
+          "kern" 1,
+          "liga" 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      body[data-bg="dark"] {
+        background-color: var(--mono-100);
+        color: var(--mono-1000);
+      }
+      body[data-bg="transparent"] {
+        background-color: transparent;
+        color: var(--mono-1000);
+      }
+
+      /* Wrapper that contains the rendered variant. The renderer screenshots
+         either the first [data-variant-root] inside [data-content], or the
+         first child of [data-content]. */
+      [data-content] {
+        display: inline-block;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <!-- Tailwind via CDN with inline Mozart-themed config. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Mirrors web/tailwind.config.js (theme.extend.colors) so primitive
+      // snippets can use the same utility class names as the Mozart codebase.
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Falcon", "sans-serif"],
+              mono: ["Roboto Mono", "monospace"],
+            },
+            colors: {
+              "daw-bg": {
+                primary: "#0a0a0a",
+                secondary: "#1a1a1a",
+                tertiary: "#2a2a2a",
+                glass: "rgba(26, 26, 26, 0.8)",
+              },
+              "daw-border": {
+                primary: "#333333",
+                secondary: "#404040",
+              },
+              "daw-text": {
+                primary: "#ffffff",
+                secondary: "#a3a3a3",
+                tertiary: "#737373",
+                muted: "#525252",
+              },
+              "daw-accent": {
+                primary: "#4ade80",
+                secondary: "#22c55e",
+                tertiary: "#16a34a",
+                glow: "rgba(74, 222, 128, 0.3)",
+              },
+              "daw-red": "#ef4444",
+              "daw-orange": "#f97316",
+              "daw-blue": "#3b82f6",
+              "daw-purple": "#8b5cf6",
+              meter: {
+                safe: "#22c55e",
+                moderate: "#eab308",
+                hot: "#f97316",
+                clip: "#ef4444",
+                bg: "#0a0a0a",
+              },
+              glass: {
+                bg: "rgba(26, 26, 26, 0.6)",
+                border: "rgba(255, 255, 255, 0.1)",
+              },
+              charcoal: "#121212",
+              mono: {
+                0: "#000000",
+                50: "#040404",
+                75: "#070707",
+                100: "#0A0A0A",
+                200: "#191919",
+                300: "#252525",
+                400: "#303030",
+                500: "#474747",
+                600: "#5E5E5E",
+                700: "#787878",
+                800: "#9C9C9C",
+                900: "#BABABA",
+                950: "#D9D9D9",
+                1000: "#FFFFFF",
+              },
+              tangerine: "#FFB413",
+              coral: "#FF615E",
+              salmon: "#FF7C68",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body data-bg="dark">
+    <div data-content>
+      <!--CONTENT-->
+    </div>
+  </body>
+</html>
